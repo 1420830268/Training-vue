@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xuanyuan.training.project.course.mapper.HzCourseMapper">
+    
+    <resultMap type="HzCourse" id="HzCourseResult">
+        <result property="id"    column="id"    />
+        <result property="courseName"    column="course_name"    />
+        <result property="courseSn"    column="course_sn"    />
+        <result property="courseLogo"    column="course_logo"    />
+        <result property="courseTypeId"    column="course_type_id"    />
+        <result property="courseIntor"    column="course_intor"    />
+        <result property="score"    column="score"    />
+        <result property="sort"    column="sort"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="remark"    column="remark"    />
+        <result property="delFlag"    column="del_flag"    />
+        <result property="typeName"    column="type_name"    />
+    </resultMap>
+
+    <sql id="selectHzCourseVo">
+        select c.id, c.course_name, c.course_sn, c.course_logo, c.course_type_id, c.course_intor, c.score, c.sort, c.create_by, c.create_time, c.update_by, c.update_time, c.remark, c.del_flag ,t.type_name from hz_course c LEFT JOIN hz_course_type t ON c.course_type_id=t.id
+    </sql>
+
+    <select id="selectHzCourseList" parameterType="HzCourse" resultMap="HzCourseResult">
+        <include refid="selectHzCourseVo"/>
+        <where>  
+            <if test="courseName != null  and courseName != ''"> and c.course_name like concat('%', #{courseName}, '%')</if>
+            <if test="courseSn != null  and courseSn != ''"> and c.course_sn = #{courseSn}</if>
+        </where>
+    </select>
+    
+    <select id="selectHzCourseById" parameterType="Long" resultMap="HzCourseResult">
+        <include refid="selectHzCourseVo"/>
+        where c.id = #{id}
+    </select>
+        
+    <insert id="insertHzCourse" parameterType="HzCourse" useGeneratedKeys="true" keyProperty="id">
+        insert into hz_course
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="courseName != null  and courseName != ''">course_name,</if>
+            <if test="courseSn != null  and courseSn != ''">course_sn,</if>
+            <if test="courseLogo != null  and courseLogo != ''">course_logo,</if>
+            <if test="courseTypeId != null  and courseTypeId != ''">course_type_id,</if>
+            <if test="courseIntor != null  and courseIntor != ''">course_intor,</if>
+            <if test="score != null ">score,</if>
+            <if test="sort != null ">sort,</if>
+            <if test="createBy != null  and createBy != ''">create_by,</if>
+            <if test="createTime != null ">create_time,</if>
+            <if test="updateBy != null  and updateBy != ''">update_by,</if>
+            <if test="updateTime != null ">update_time,</if>
+            <if test="remark != null  and remark != ''">remark,</if>
+            <if test="delFlag != null  and delFlag != ''">del_flag,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="courseName != null  and courseName != ''">#{courseName},</if>
+            <if test="courseSn != null  and courseSn != ''">#{courseSn},</if>
+            <if test="courseLogo != null  and courseLogo != ''">#{courseLogo},</if>
+            <if test="courseTypeId != null  and courseTypeId != ''">#{courseTypeId},</if>
+            <if test="courseIntor != null  and courseIntor != ''">#{courseIntor},</if>
+            <if test="score != null ">#{score},</if>
+            <if test="sort != null ">#{sort},</if>
+            <if test="createBy != null  and createBy != ''">#{createBy},</if>
+            <if test="createTime != null ">#{createTime},</if>
+            <if test="updateBy != null  and updateBy != ''">#{updateBy},</if>
+            <if test="updateTime != null ">#{updateTime},</if>
+            <if test="remark != null  and remark != ''">#{remark},</if>
+            <if test="delFlag != null  and delFlag != ''">#{delFlag},</if>
+         </trim>
+    </insert>
+
+    <update id="updateHzCourse" parameterType="HzCourse">
+        update hz_course
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="courseName != null  and courseName != ''">course_name = #{courseName},</if>
+            <if test="courseSn != null  and courseSn != ''">course_sn = #{courseSn},</if>
+            <if test="courseLogo != null  and courseLogo != ''">course_logo = #{courseLogo},</if>
+            <if test="courseTypeId != null  and courseTypeId != ''">course_type_id = #{courseTypeId},</if>
+            <if test="courseIntor != null  and courseIntor != ''">course_intor = #{courseIntor},</if>
+            <if test="score != null ">score = #{score},</if>
+            <if test="sort != null ">sort = #{sort},</if>
+            <if test="createBy != null  and createBy != ''">create_by = #{createBy},</if>
+            <if test="createTime != null ">create_time = #{createTime},</if>
+            <if test="updateBy != null  and updateBy != ''">update_by = #{updateBy},</if>
+            <if test="updateTime != null ">update_time = #{updateTime},</if>
+            <if test="remark != null  and remark != ''">remark = #{remark},</if>
+            <if test="delFlag != null  and delFlag != ''">del_flag = #{delFlag},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteHzCourseById" parameterType="Long">
+        delete from hz_course where id = #{id}
+    </delete>
+
+    <delete id="deleteHzCourseByIds" parameterType="String">
+        delete from hz_course where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+</mapper>
