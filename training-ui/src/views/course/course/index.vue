@@ -137,6 +137,17 @@
           <el-input-number v-model="form.sort" controls-position="right" :min="0" />
         </el-form-item>
 
+        <el-form-item label="课程镜像" prop="courseTypeId">
+          <el-select v-model="form.imageIds" multiple placeholder="请选择课程镜像" style="width: 600px">
+            <el-option
+              v-for="item in imageOptions"
+              :key="item.id"
+              :label="item.imageName"
+              :value="item.id"
+            ></el-option>
+          </el-select>
+        </el-form-item>
+
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button type="primary" @click="submitForm">确 定</el-button>
@@ -148,7 +159,10 @@
 
 <script>
 import { listCourse, getCourse, delCourse, addCourse, updateCourse, exportCourse } from "@/api/course/course";
-import {getTypeList } from "@/api/course/type";
+import { getTypeList } from "@/api/course/type";
+import { listImage} from "@/api/docker/image";
+
+
 export default {
   name: "Course",
   data() {
@@ -182,11 +196,15 @@ export default {
       rules: {
       },
       //类型选项
-      typeOptions:[]
+      typeOptions:[],
+      //镜像选项
+      imageOptions:[]
     };
   },
   created() {
     this.getList();
+
+
   },
   methods: {
     /** 查询课程实体类列表 */
@@ -218,7 +236,8 @@ export default {
         createTime: undefined,
         updateBy: undefined,
         updateTime: undefined,
-        remark: undefined
+        remark: undefined,
+        imageIds:[]
       };
       this.resetForm("form");
     },
@@ -238,15 +257,24 @@ export default {
       this.single = selection.length!=1
       this.multiple = !selection.length
     },
+    //类型列表
     getTypeList(){
       getTypeList().then(response => {
         this.typeOptions = response.typeList;
+      });
+    },
+    //镜像列表
+    getImageList(){
+      let qParam={};
+      listImage(qParam).then(response => {
+        this.imageOptions=response.rows;
       });
     },
     /** 新增按钮操作 */
     handleAdd() {
       this.reset();
       this.getTypeList();
+      this.getImageList();
       this.open = true;
       this.title = "添加课程";
     },
@@ -254,6 +282,7 @@ export default {
     handleUpdate(row) {
       this.reset();
       this.getTypeList();
+      this.getImageList();
       const id = row.id || this.ids
       getCourse(id).then(response => {
         this.form = response.data;
