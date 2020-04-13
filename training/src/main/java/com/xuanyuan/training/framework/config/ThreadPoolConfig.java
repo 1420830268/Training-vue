@@ -3,7 +3,11 @@ package com.xuanyuan.training.framework.config;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadPoolExecutor;
+
+import com.xuanyuan.training.framework.security.service.TokenService;
 import org.apache.commons.lang3.concurrent.BasicThreadFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
@@ -15,8 +19,9 @@ import com.xuanyuan.training.common.utils.Threads;
  * @author Lee
  **/
 @Configuration
-public class ThreadPoolConfig
-{
+public class ThreadPoolConfig {
+
+    private static final Logger log = LoggerFactory.getLogger(ThreadPoolConfig.class);
     // 核心线程池大小
     private int corePoolSize = 50;
 
@@ -30,15 +35,18 @@ public class ThreadPoolConfig
     private int keepAliveSeconds = 300;
 
     @Bean(name = "threadPoolTaskExecutor")
-    public ThreadPoolTaskExecutor threadPoolTaskExecutor()
-    {
+    public ThreadPoolTaskExecutor threadPoolTaskExecutor(){
+
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setMaxPoolSize(maxPoolSize);
-        executor.setCorePoolSize(corePoolSize);
-        executor.setQueueCapacity(queueCapacity);
-        executor.setKeepAliveSeconds(keepAliveSeconds);
+        executor.setMaxPoolSize(maxPoolSize);// 设置最大线程数
+        executor.setCorePoolSize(corePoolSize);// 设置核心线程数
+        executor.setQueueCapacity(queueCapacity);// 设置队列容量
+        executor.setKeepAliveSeconds(keepAliveSeconds); // 设置允许的空闲时间（秒）
+        executor.setThreadNamePrefix("thread-");// 设置默认线程名称
         // 线程池对拒绝任务(无线程可用)的处理策略
         executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
+        // 等待所有任务结束后再关闭线程池
+        executor.setWaitForTasksToCompleteOnShutdown(true);
         return executor;
     }
 
